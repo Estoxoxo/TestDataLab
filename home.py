@@ -1,3 +1,5 @@
+
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -22,7 +24,7 @@ def extraer_fecha(nombre_archivo):
     if match:
         return match.group(0)
     else:
-        st.error(f"El archivo '{nombre_archivo}' no contiene una fecha válida.")
+        #st.error(f"El archivo '{nombre_archivo}' no contiene una fecha válida.")
         return None
 
 # Función para validar archivo
@@ -34,8 +36,7 @@ def validar_archivo_nombre(archivo):
     
     if prefijo and sufijo and fecha:
         st.success(f"Archivo cargado correctamente.\nPrefijo: {prefijo}\nSufijo: {sufijo}\nFecha: {fecha}")
-    else:
-        st.error(f"El archivo '{nombre_archivo}' no cumple con el formato esperado.")
+   
     
     return prefijo, sufijo, fecha
 
@@ -133,13 +134,19 @@ if archivos_subidos and st.session_state.original_df is None:
             except Exception as e:
                 st.error(f"Error al cargar el archivo CSV: {str(e)}")
         elif file_type == 'xlsx':
+
+
+            decimal = st.selectbox("Selecciona el símbolo decimal:", decimales)
+            
             try:
-                st.session_state.original_df = pd.read_excel(archivo)
+                st.session_state.original_df = pd.read_excel(archivo, decimal=decimal)
             except Exception as e:
                 st.error(f"Error al cargar el archivo Excel: {str(e)}")
         elif file_type == 'json':
+            encoding = st.selectbox("Selecciona el encoding:", encodings)
+
             try:
-                st.session_state.original_df = pd.read_json(archivo)
+                st.session_state.original_df = pd.read_json(archivo, encoding=encoding)
             except Exception as e:
                 st.error(f"Error al cargar el archivo JSON: {str(e)}")
         elif file_type == 'parquet':
@@ -155,6 +162,7 @@ if archivos_subidos and st.session_state.original_df is None:
                 time.sleep(5)
                 st.success('Puedes ver y seleccionar columnas del archivo cargado')
                 st.dataframe(st.session_state.final_df)
+                
 
 # Si el usuario selecciona columnas, las almacenamos en session_state
 if st.session_state.original_df is not None:
@@ -176,8 +184,14 @@ if st.session_state.original_df is not None:
 
 # Mostrar DataFrame seleccionado si se han seleccionado columnas
 if st.session_state.columnas_seleccionadas:
+
+
     st.write("### DataFrame Seleccionado")
+    
     st.dataframe(st.session_state.df_seleccionado)
+    
+    with st.expander("DataFrame Original"):
+        st.dataframe(st.session_state.original_df.copy())
 
 # Sidebar con opciones de transformación y validaciones de archivo
 with st.sidebar:
@@ -195,14 +209,14 @@ with st.sidebar:
     st.header("Eliminación de Datos:")
     delete_column_option = st.checkbox("Borrar columna")
     
-    st.header("Validación de Esquema:")
-    validate_schema_option = st.checkbox("Validar el Esquema")
-    data_quantity_option = st.checkbox("Cantidad de Datos")
-    data_validation_option = st.checkbox("Validación de la Data")
-    nombre_columnas = st.checkbox("Nombre de las Columnas")
-    orden_columnas = st.checkbox("Orden de las Columnas")
-    tipo_dato = st.checkbox("Validación tipo de Datos en la Tabla")
-    valores_permitidos = st.checkbox("Valores Permitidos (Nulos, Caracteres especiales, Duplicados)")
+    #st.header("Validación de Esquema:")
+    #validate_schema_option = st.checkbox("Validar el Esquema")
+    #data_quantity_option = st.checkbox("Cantidad de Datos")
+    #data_validation_option = st.checkbox("Validación de la Data")
+    #nombre_columnas = st.checkbox("Nombre de las Columnas")
+    #orden_columnas = st.checkbox("Orden de las Columnas")
+    #tipo_dato = st.checkbox("Validación tipo de Datos en la Tabla")
+    #valores_permitidos = st.checkbox("Valores Permitidos (Nulos, Caracteres especiales, Duplicados)")
     
     st.title("Opciones de Guardado")
     guardar_csv = st.checkbox("Guardar como CSV")
